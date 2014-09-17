@@ -1,0 +1,89 @@
+﻿<Window x:Class="DVBT2Viewer.UI.ChannelSearchWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:usercontrols="clr-namespace:DVBT2Viewer.UI.UserControls"
+        xmlns:viewmodels="clr-namespace:DVBT2Viewer.UI.ViewModels"
+        xmlns:models="clr-namespace:DVBT2Viewer.BDA.Models;assembly=DVBT2Viewer.BDA"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        Title="Channel Search" Height="300" Width="500" WindowStartupLocation="CenterScreen">
+    <Window.DataContext>
+        <viewmodels:ChannelSearchViewModel/>        
+    </Window.DataContext>
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadedCommand}" />
+        </i:EventTrigger>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding ClosingCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Window.Resources>
+        <Style TargetType="{x:Type Label}">
+            <Style.Setters>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Margin" Value="0"/>
+                <Setter Property="Padding" Value="4,2"/>
+            </Style.Setters>
+        </Style>
+        <Style TargetType="{x:Type TextBox}">
+            <Style.Setters>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+            </Style.Setters>
+        </Style>
+        <DataTemplate x:Key="ChannelNameDataTemplate" DataType="{x:Type models:DigitalChannel}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding ChannelType}"/>
+                <TextBlock Text=" - "/>
+                <TextBlock Text="{Binding ChannelName}"/>
+            </StackPanel>
+        </DataTemplate>        
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <Grid Margin="0,5,0,0" Height="24">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Label Content="Frequency (kHz)" />
+            <TextBox Grid.Column="1" Text="{Binding Frequency}" >
+            </TextBox>
+            <Label Content="Bandwidth (MHz)" Grid.Column="2" />
+            <TextBox Grid.Column="3" Text="{Binding Bandwidth}" />
+            <Button MinWidth="100" Content="Lock" Grid.Column="4" Margin="5,0" Command="{Binding LockCommand}" />
+        </Grid>
+        
+        <Grid Grid.Row="1" Margin="0,5,4,0" Height="24" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Label Content="Signal level" />
+            <usercontrols:ProgressBarWithPercents Grid.Column="1" Value="{Binding SignalLevel}" >
+            </usercontrols:ProgressBarWithPercents>
+            <Label Content="Signal quality" Grid.Column="2" />
+            <usercontrols:ProgressBarWithPercents Grid.Column="3" Value="{Binding SignalQuality}" />
+        </Grid>
+        
+        <Button Grid.Row="2" Margin="4,5,4,0" Height="24" MaxWidth="200" Content="Search" Command="{Binding SearchCommand}" />
+        
+        <ListBox Grid.Row="3" Margin="4,5,4,0" ItemsSource="{Binding Channels}" ItemTemplate="{StaticResource ChannelNameDataTemplate}"/>
+        
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="4,5" Height="24">
+            <Button Content="Save and exit" MinWidth="100" Command="{Binding SaveAndExitCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
+            <Button Content="Close" MinWidth="100" Margin="5,0,0,0" Command="{Binding CloseViewModelCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
+        </StackPanel>
+    </Grid>
+</Window>

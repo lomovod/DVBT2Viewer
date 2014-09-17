@@ -1,0 +1,97 @@
+﻿<Window x:Class="DVBT2Viewer.UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:usercontrols="clr-namespace:DVBT2Viewer.UI.UserControls"
+        xmlns:viewmodels="clr-namespace:DVBT2Viewer.UI.ViewModels"
+        xmlns:helpers="clr-namespace:DVBT2Viewer.UI.Helpers"
+        xmlns:models="clr-namespace:DVBT2Viewer.BDA.Models;assembly=DVBT2Viewer.BDA"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        Title="{Binding WindowTitle}" Height="500" Width="700" WindowStartupLocation="CenterScreen">
+    <Window.DataContext>
+        <viewmodels:MainWindowViewModel/>
+    </Window.DataContext>
+    <Window.Resources>
+        <DataTemplate x:Key="ChannelNameDataTemplate" DataType="{x:Type models:DigitalChannel}">
+            <StackPanel Orientation="Horizontal" Margin="5">
+                <TextBlock Text="{Binding ChannelType, StringFormat='[{0}] '}"/>
+                <TextBlock Text="{Binding ChannelName}"/>
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadedCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" />
+        </i:EventTrigger>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding ClosingCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Menu -->
+        <Menu>
+            <Menu.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <DockPanel HorizontalAlignment="Stretch" Height="25"/>
+                </ItemsPanelTemplate>
+            </Menu.ItemsPanel>
+            <MenuItem Header="Search channels" Command="{Binding SearchChannelsCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
+            <MenuItem Header="Make channel screenshot" Command="{Binding MakeScreenshotCommand}"/>
+            <MenuItem Header="Exit" HorizontalAlignment="Right" Command="{Binding CloseViewModelCommand}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}" />
+        </Menu>
+        
+        <!-- Content --> 
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <ListBox Width="250" ItemsSource="{Binding Channels}" SelectedItem="{Binding SelectedChannel}" ItemTemplate="{StaticResource ChannelNameDataTemplate}"/>
+
+            <usercontrols:VideoControlHost Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                                           WindowPositionChangedCommand="{Binding ResizeVideoFrameCommand}" 
+                                           RepaintCommand="{Binding RepaintVideoFrameCommand}">
+                <helpers:DataPiping.DataPipes>
+                    <helpers:DataPipeCollection>
+                        <helpers:DataPipe 
+                            Source="{Binding RelativeSource={RelativeSource AncestorType={x:Type usercontrols:VideoControlHost}}, Path=Handle}"
+                            Target="{Binding RenderHandle, Mode=OneWayToSource}"/>
+                        <helpers:DataPipe 
+                            Source="{Binding RelativeSource={RelativeSource AncestorType={x:Type usercontrols:VideoControlHost}}, Path=ActualWidth}"
+                            Target="{Binding VideoFrameWidth, Mode=OneWayToSource}"/>
+                        <helpers:DataPipe 
+                            Source="{Binding RelativeSource={RelativeSource AncestorType={x:Type usercontrols:VideoControlHost}}, Path=ActualHeight}"
+                            Target="{Binding VideoFrameHeight, Mode=OneWayToSource}"/>
+                    </helpers:DataPipeCollection>
+                </helpers:DataPiping.DataPipes>
+            </usercontrols:VideoControlHost>
+        </Grid>
+        
+        <!-- Status bar -->
+        <StatusBar Grid.Row="2" VerticalAlignment="Bottom">
+            <StatusBarItem>
+                <ContentControl Content="{Binding SelectedChannel}" ContentTemplate="{StaticResource ChannelNameDataTemplate}" />
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Margin="0,0,4,0">Level</TextBlock>
+                    <usercontrols:ProgressBarWithPercents Width="100" Height="15" Value="{Binding SignalLevel}" />
+                </StackPanel>
+            </StatusBarItem>
+            <Separator/>
+            <StatusBarItem>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Margin="0,0,4,0">Quality</TextBlock>
+                    <usercontrols:ProgressBarWithPercents Width="100" Height="15" Value="{Binding SignalQuality}" />
+                </StackPanel>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>
