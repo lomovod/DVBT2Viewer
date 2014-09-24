@@ -147,7 +147,7 @@ namespace DVBT2Viewer.UI.ViewModels
             finally
             {
                 if (!levelAndQualityTimer.IsEnabled)
-                    levelAndQualityTimer.Stop();
+                    levelAndQualityTimer.Start();
                 searchCommandCanExecute = true;
                 searchCommand.RaiseCanExecuteChanged();
             }

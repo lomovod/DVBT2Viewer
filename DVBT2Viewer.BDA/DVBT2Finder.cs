@@ -74,6 +74,9 @@ namespace DVBT2Viewer.BDA
             if (plpSupported.HasFlag(KSPropertySupport.Get))
                 plpMaxCount = (int)KsPropertyHelper.KSGetNode(graph.TunerPin, KSPropSets.KSPROPSETID_BdaDigitalDemodulator,
                     (int)KSPROPERTY_BDA_DIGITAL_DEMODULATOR.KSPROPERTY_BDA_PLP_NUMBER, typeof(int));
+            // To avoid possible driver bugs
+            if (plpMaxCount <= 0)
+                plpMaxCount = 255;
 
             int currentPlp = 0;
             while (currentPlp < plpMaxCount)

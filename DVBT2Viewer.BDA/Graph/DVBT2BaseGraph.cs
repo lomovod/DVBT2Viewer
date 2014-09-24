@@ -294,23 +294,22 @@ namespace DVBT2Viewer.BDA.Graph
                         DsFindPin.ByDirection(tuner, PinDirection.Input, 0), false);
 
                     TunerDeviceName = device.Name;
+                    return;
                 }
                 catch
                 {
                     // Connection failed
-                    if (capture != null)
+                    if (tuner != null)
                     {
                         // Remove filter from graph
-                        graphBuilder.RemoveFilter(capture);
+                        graphBuilder.RemoveFilter(tuner);
                         // Release filter's COM object
-                        Marshal.ReleaseComObject(capture);
-                        capture = null;
+                        Marshal.ReleaseComObject(tuner);
+                        tuner = null;
                     }                    
-                    throw;
                 }
-                if (tuner == null)
-                    throw new Exception("Cannot create capture filter");
             }
+            throw new Exception("Cannot create capture filter");
         }
 
         /// <summary>

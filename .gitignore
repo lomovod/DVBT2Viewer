@@ -155,3 +155,5 @@ $RECYCLE.BIN/
 # Mac desktop service store files
 .DS_Store
 Graph.GRF
+Deploy/dvbt2viever_demo.zip
+Deploy/dvbt2viewer_src.zip
